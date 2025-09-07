@@ -1,32 +1,51 @@
-Dead Stock Intelligence Platform
+# 🏷️ Dead Stock Intelligence Platform
 
-A SaaS platform that ingests inventory, sales, returns, and cost data, continuously scores SKUs for dead-stock risk (rules + ML), alerts merchants, and recommends financially optimized actions (discounts, bundles, liquidation). The platform also provides a simulation engine and financial dashboard to monitor working capital and profit impact.
+A **SaaS platform** that ingests **inventory, sales, returns, and cost data**, continuously scores SKUs for **dead-stock risk (rules + ML)**, alerts merchants, and recommends **financially optimized actions** (discounts, bundles, liquidation). The platform also provides a **simulation engine** and **financial dashboard** to monitor working capital and profit impact.  
 
-✨ Features
+---
 
-🔍 Real-time detection & alerts
-Rule + ML-based signals for “at-risk” and “dead” SKUs with Email, Slack, SMS, and Push alerts.
+## ✨ Features
 
-💬 Natural Language → SQL
-Ask plain-English queries (e.g., “show items with zero sales in 120 days”) and get safe, validated SQL.
+- 🔍 **Real-time detection & alerts**  
+  Rule + ML-based signals for “at-risk” and “dead” SKUs with Email, Slack, SMS, and Push alerts.  
 
-📊 Insights & Recommendations
-Suggests discount %, bundles, supplier returns, or liquidation with P&L impact analysis.
+- 💬 **Natural Language → SQL**  
+  Ask plain-English queries (e.g., *“show items with zero sales in 120 days”*) and get safe, validated SQL.  
 
-⚙️ Custom Rules
-Merchants can configure thresholds by days, quantity, category, supplier.
+- 📊 **Insights & Recommendations**  
+  Suggests discount %, bundles, supplier returns, or liquidation with **P&L impact analysis**.  
 
-📈 Financial Dashboard
-KPIs: dead stock value, carrying costs, opportunity cost, inventory turns, working capital tied up.
+- ⚙️ **Custom Rules**  
+  Merchants can configure thresholds by **days, quantity, category, supplier**.  
 
-🔮 Simulation Engine
-Run “what-if” scenarios — e.g., apply 20% discount → projected sell-through & margin.
+- 📈 **Financial Dashboard**  
+  KPIs: dead stock value, carrying costs, opportunity cost, inventory turns, working capital tied up.  
 
-🔗 Integrations
-Shopify, Magento, Amazon, ERP, POS, QuickBooks, Tally, and WMS connectors.
+- 🔮 **Simulation Engine**  
+  Run *“what-if”* scenarios — e.g., *apply 20% discount → projected sell-through & margin*.  
 
+- 🔗 **Integrations**  
+  Shopify, Magento, Amazon, ERP, POS, QuickBooks, Tally, and WMS connectors.  
+
+---
+
+## 🏗️ Architecture
+
+```mermaid
+flowchart TD
+    A[Invoice Image Upload] -->|OpenCV + Gemini| B[Data Extraction]
+    B --> C[Supabase DB]
+    C --> D[Backend API (FastAPI)]
+    D --> E[ML Models (Risk Scoring, Forecasting)]
+    D --> F[Business Rules Engine]
+    E --> G[Recommendations Engine]
+    F --> G
+    G --> H[Financial Dashboard (Next.js + Tailwind)]
+    G --> I[Alerts: Email/Slack/SMS]
 🗄️ Database Schema
 Products
+sql
+Copy code
 create table products (
   id bigserial primary key,
   sku text unique not null,
@@ -37,24 +56,27 @@ create table products (
   list_price numeric,
   created_at timestamptz default now()
 );
-
 Inventory
+sql
+Copy code
 create table inventory (
   id bigserial primary key,
   product_id bigint references products(id) on delete cascade,
   stock_on_hand int not null default 0,
   last_count_date timestamptz default now()
 );
-
 Invoices
+sql
+Copy code
 create table invoices (
   id bigserial primary key,
   file_url text,
   supplier text,
   uploaded_at timestamptz default now()
 );
-
 Invoice Items
+sql
+Copy code
 create table invoice_items (
   id bigserial primary key,
   invoice_id bigint references invoices(id) on delete cascade,
@@ -62,9 +84,7 @@ create table invoice_items (
   qty int,
   unit_price numeric
 );
-
 ⚡ Tech Stack
-
 Backend: Python (FastAPI), PostgreSQL (Supabase), dbt/Airflow for ETL
 
 ML Models: Logistic Regression, XGBoost/LightGBM, Prophet (forecasting)
@@ -77,27 +97,31 @@ Auth/Security: Supabase Auth, OAuth2, RBAC, TLS, encryption at rest
 
 🚀 Getting Started
 1. Clone repo
+bash
+Copy code
 git clone https://github.com/<your-org>/deadstock-intelligence.git
 cd deadstock-intelligence
-
 2. Configure environment
-
 Create .env file:
 
+ini
+Copy code
 SUPABASE_URL=https://<project>.supabase.co
 SUPABASE_KEY=<service-role-key>
 DATABASE_URL=postgresql://postgres:<password>@db.<host>.supabase.co:5432/postgres
-
 3. Install dependencies
+bash
+Copy code
 pip install -r requirements.txt
 npm install --prefix frontend
-
 4. Run backend
+bash
+Copy code
 uvicorn app.main:app --reload
-
 5. Run frontend
+bash
+Copy code
 npm run dev --prefix frontend
-
 📡 API Endpoints (Sample)
 Method	Endpoint	Description
 GET	/products	List products
@@ -105,14 +129,16 @@ POST	/invoices/upload	Upload invoice & extract items
 GET	/inventory/at-risk	Get at-risk SKUs with scores & insights
 POST	/query/nl-to-sql	Convert natural language to SQL
 GET	/dashboard/financials	Get KPIs & metrics for dashboard
-🧮 Example Query
 
+🧮 Example Query
 Plain English:
 
 Show items with zero sales in the last 120 days
 
 Generated SQL:
 
+sql
+Copy code
 SELECT p.sku, p.name, i.stock_on_hand,
        MAX(o.order_date) AS last_sale_date,
        (i.stock_on_hand * p.cost_price) AS stock_value
@@ -122,9 +148,7 @@ LEFT JOIN orders o ON o.product_id = p.id
 GROUP BY p.sku, p.name, i.stock_on_hand, p.cost_price
 HAVING MAX(o.order_date) IS NULL OR MAX(o.order_date) < current_date - INTERVAL '120 days'
 ORDER BY last_sale_date DESC NULLS FIRST;
-
 📈 Roadmap
-
  MVP: deterministic rules, alerts, dashboard, NL→SQL (read-only)
 
  ML risk scoring + recommendation engine
@@ -136,7 +160,6 @@ ORDER BY last_sale_date DESC NULLS FIRST;
  Multi-channel orchestration & advanced optimization
 
 🤝 Contributing
-
 Fork the repo
 
 Create a feature branch (git checkout -b feature-name)
@@ -148,5 +171,27 @@ Push branch (git push origin feature-name)
 Open a Pull Request
 
 📜 License
-
 MIT License © 2025 — Open for use and contributions.
+
+pgsql
+Copy code
+
+---
+
+✅ This is the **final complete README** — ready to be dropped into your project root as `README.md`.  
+
+Do you also want me to add **setup instructions for Supabase (DB + Auth + Storage)** in this README, so someone new can get the database side working instantly?
+
+
+
+
+
+
+
+Ask ChatGPT
+
+
+
+
+
+ChatGPT can make mistakes. Check important info. See Cookie Preferences.
