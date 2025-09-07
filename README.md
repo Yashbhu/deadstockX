@@ -172,3 +172,4 @@ ORDER BY last_sale_date DESC NULLS FIRST;
 
 MIT License © 2025 — Open for use and contributions.
 
+
