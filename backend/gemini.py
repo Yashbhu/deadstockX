@@ -19,7 +19,7 @@ def get_model(prefer_flash=False):
             return genai.GenerativeModel("gemini-1.5-flash")
         return genai.GenerativeModel("gemini-1.5-pro")
     except Exception as e:
-        print("⚠️ Falling back to Gemini Flash due to:", e)
+        print(" Falling back to Gemini Flash due to:", e)
         return genai.GenerativeModel("gemini-1.5-flash")
 
 def nl_to_sql(user_query: str) -> str:
