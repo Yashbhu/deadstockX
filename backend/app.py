@@ -1,4 +1,3 @@
-# backend/app.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -9,8 +8,6 @@ from gemini_config import nl_to_sql
 supabase = get_supabase()
 app = FastAPI()
 
-# Enable CORS for frontend
-origins = ["http://localhost:5173"]  # frontend URL
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -19,7 +16,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# -------------------- Models --------------------
+
 class InventoryItem(BaseModel):
     name: str
     category: Optional[str] = "other"
@@ -38,11 +35,11 @@ class InvoicePayload(BaseModel):
 class NLQuery(BaseModel):
     text: str
 
-# -------------------- Endpoints --------------------
+
 @app.post("/invoices")
 def create_invoice(invoice: InvoicePayload):
     try:
-        # Insert invoice
+       
         invoice_resp = supabase.table("invoices").insert({
             "file_url": invoice.file_url or "manual-entry",
             "supplier": invoice.supplier
@@ -50,7 +47,7 @@ def create_invoice(invoice: InvoicePayload):
 
         invoice_id = invoice_resp.data[0]["id"]
 
-        # Insert invoice items
+      
         items_data = [item.dict() | {"invoice_id": invoice_id} for item in invoice.items]
         supabase.table("invoice_items").insert(items_data).execute()
 
