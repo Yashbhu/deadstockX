@@ -1,9 +1,9 @@
 from db import get_supabase
-from gemini import genai  # import whole lib instead of just model
+from gemini import genai 
 
 supabase = get_supabase()
 
-# Prefer PRO, fallback to FLASH
+
 def get_model(prefer_flash=False):
     if prefer_flash:
         return genai.GenerativeModel("gemini-1.5-flash")
