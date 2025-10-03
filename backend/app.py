@@ -14,7 +14,6 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-   
 )
 
 
@@ -57,7 +56,7 @@ def create_invoice(invoice: InvoicePayload):
         return {"error": str(e)}
 
 @app.get("/low-stock")
-def low_stock_products():
+
     try:
         result = supabase.table("inventory").select("id, name, stock_on_hand, age, price").lt("stock_on_hand", 10).execute()
         items = []
